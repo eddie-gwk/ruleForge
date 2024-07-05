@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: ruleForge-node
+
+dubbo:
+  application:
+    id: ruleForge-node-provider
+    name: ruleForge-node-provider
+  provider:
+    version: 1.0
+  protocol:
+    name: dubbo
+    port: 28848
+  registry:
+    id: ruleForge-node-registry
+    address: zookeeper://127.0.0.1:2181
+    timeout: 20000
+    simplified: true
+  metadata-report:
+    address: zookeeper://127.0.0.1:2181
+  scan:
+    base-packages: com\yunext\node\provider
+  consumer:
+    check: false
+    version: 1.0
+    timeout: 5000
