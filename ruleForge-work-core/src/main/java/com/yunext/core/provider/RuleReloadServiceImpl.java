@@ -1,4 +1,4 @@
-package com.yunext.reload.provider;
+package com.yunext.core.provider;
 
 import com.yomahub.liteflow.builder.el.LiteFlowChainELBuilder;
 import com.yunext.api.dto.RuleSyntaxTreeDto;
@@ -28,7 +28,7 @@ public class RuleReloadServiceImpl implements RuleReloadService {
         if (StringUtil.isEmpty(chain)) {
             return ResultDto.fail("must specify the chain of rules to be reload");
         }
-        RMapCache<Object, Object> chainRule = redissonClient.getMapCache(chain);
+        RMapCache<Object, Object> chainRule = redissonClient.getMapCache("chain_rules");
         //验证DSL是否合法,不合法直接删除，不让执行
         boolean validate = LiteFlowChainELBuilder.validate(rule);
         if (validate) {

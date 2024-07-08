@@ -28,7 +28,7 @@ public abstract class IsolationNodeComponent extends NodeComponent {
         super.afterProcess();
     }
 
-    public Integer subContextIndex() {
+    public Integer getSubContextIndex() {
         return indexLocal.get();
     }
 }

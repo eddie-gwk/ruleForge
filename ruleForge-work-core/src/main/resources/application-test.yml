@@ -4,26 +4,15 @@ spring:
 
 dubbo:
   application:
-    id: ruleForge-core-provider
     name: ruleForge-core-provider
-  provider:
-    version: 1.0
+    qos-enable: false
   protocol:
     name: dubbo
-    port: 28850
+    port: -1
   registry:
-    id: ruleForge-core-registry
-    address: zookeeper://127.0.0.1:2181
-    timeout: 20000
-    simplified: true
-  metadata-report:
     address: zookeeper://127.0.0.1:2181
   scan:
-    base-packages: com\yunext\core\provider
-  consumer:
-    check: false
-    version: 1.0
-    timeout: 5000
+    base-packages: com.yunext.core.provider
 liteflow:
   rule-source-ext-data-map:
     host: 127.0.0.1
@@ -34,8 +23,8 @@ liteflow:
     mode: sub
     pollingInterval: 5
     pollingStartTime: 1
-    chainDataBase: 0
+    chainDataBase: 1
     chainKey: chains
     #如果你没有脚本组件，以下可以不配置
-    scriptDataBase: 0
+    scriptDataBase: 1
     scriptKey: scripts

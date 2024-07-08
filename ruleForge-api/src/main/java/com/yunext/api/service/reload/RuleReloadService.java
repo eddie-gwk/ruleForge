@@ -13,9 +13,9 @@ import java.util.List;
 public interface RuleReloadService {
 
 
-    ResultDto<?> reload(String chain, String rule);
+    public ResultDto<?> reload(String chain, String rule);
 
-    ResultDto<?> reload(RuleSyntaxTreeDto ruleSyntaxTreeDto);
+    public ResultDto<?> reload(RuleSyntaxTreeDto ruleSyntaxTreeDto);
 
-    ResultDto<?> reload(List<RuleSyntaxTreeDto> ruleSyntaxTreeDtoList);
+    public ResultDto<?> reload(List<RuleSyntaxTreeDto> ruleSyntaxTreeDtoList);
 }

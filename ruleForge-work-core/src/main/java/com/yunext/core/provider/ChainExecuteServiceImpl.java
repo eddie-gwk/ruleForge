@@ -1,4 +1,4 @@
-package com.yunext.core.executor;
+package com.yunext.core.provider;
 
 import com.yomahub.liteflow.core.FlowExecutor;
 import com.yunext.api.service.core.ChainExecuteService;
@@ -23,7 +23,7 @@ public class ChainExecuteServiceImpl implements ChainExecuteService {
     @Override
     public ResultDto<?> executeOnce(String chain) {
         if (StringUtil.isNotEmpty(chain)) {
-            flowExecutor.execute2Future(chain, "args", MainContext.class);
+            flowExecutor.execute2Resp(chain, "args", MainContext.class);
         }
         return ResultDto.success();
     }
