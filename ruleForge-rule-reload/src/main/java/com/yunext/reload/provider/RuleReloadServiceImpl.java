@@ -5,11 +5,11 @@ import com.yunext.api.dto.RuleSyntaxTreeDto;
 import com.yunext.api.service.reload.RuleReloadService;
 import com.yunext.common.base.ResultDto;
 import com.yunext.common.utils.StringUtil;
+import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**

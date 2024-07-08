@@ -1,5 +1,6 @@
 package com.yunext.core;
 
+import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -9,6 +10,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
  * @description ：
  * @date ：Created in 2024/7/5 11:47
  */
+@EnableDubbo
 @SpringBootApplication
 public class RuleForgeCoreApplication {
 

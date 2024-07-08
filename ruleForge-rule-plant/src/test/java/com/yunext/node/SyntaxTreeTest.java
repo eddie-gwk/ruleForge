@@ -10,7 +10,6 @@ import com.yunext.common.enums.NodeTypeEnum;
 import com.yunext.node.struct.graph.ChainNodeDirectedGraph;
 import com.yunext.node.struct.graph.ChainNodeUndirectedGraph;
 import com.yunext.node.struct.tree.RuleSyntaxTree;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;

@@ -1,26 +1,20 @@
 spring:
   application:
-    name: ruleForge-storage
-
+    name: ruleForge-client-web
 dubbo:
   application:
-    id: ruleForge-storage-provider
-    name: ruleForge-storage-provider
-  provider:
-    version: 1.0
+    id: ruleForge-client-web
+    name: ruleForge-client-web
+    qos-enable: false
   protocol:
     name: dubbo
     port: 28847
   registry:
-    id: ruleForge-storage-registry
+    id: ruleForge-client-web-registry
     address: zookeeper://127.0.0.1:2181
     timeout: 20000
     simplified: true
-  metadata-report:
-    address: zookeeper://127.0.0.1:2181
-  scan:
-    base-packages: com\yunext\storage\provider
-  consumer:
-    check: false
-    version: 1.0
-    timeout: 5000
+#  consumer:
+#    check: false
+#    version: 1.0
+#    timeout: 5000

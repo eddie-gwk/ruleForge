@@ -47,10 +47,11 @@
         <spring.test.version>3.3.1</spring.test.version>
         <fastjson.version>2.0.51</fastjson.version>
         <google.guava.version>33.2.1-jre</google.guava.version>
-        <dubbo.version>3.2.14</dubbo.version>
-        <dubbo.metadata.version>3.2.14</dubbo.metadata.version>
-        <dubbo.spring.starter.version>3.2.14</dubbo.spring.starter.version>
-        <dubbo.registry.version>3.2.14</dubbo.registry.version>
+        <dubbo.version>3.3.0-beta.4</dubbo.version>
+        <dubbo.metadata.version>3.3.0-beta.4</dubbo.metadata.version>
+        <dubbo.spring.starter.version>3.3.0-beta.4</dubbo.spring.starter.version>
+        <dubbo.registry.version>3.3.0-beta.4</dubbo.registry.version>
+        <zookeeper.depends.version>3.3.0-beta.2</zookeeper.depends.version>
         <curator.version>5.7.0</curator.version>
         <liteflow.version>2.12.1</liteflow.version>
     </properties>
@@ -125,8 +126,35 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-dependencies-zookeeper</artifactId>
+                <version>${zookeeper.depends.version}</version>
+                <type>pom</type>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>log4j</artifactId>
+                        <groupId>log4j</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
                 <artifactId>dubbo-registry-zookeeper</artifactId>
                 <version>${dubbo.registry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-client</artifactId>
+                <version>${curator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>log4j</artifactId>
+                        <groupId>log4j</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>guava</artifactId>
+                        <groupId>com.google.guava</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.curator</groupId>

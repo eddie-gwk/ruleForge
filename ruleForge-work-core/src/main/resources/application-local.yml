@@ -34,8 +34,8 @@ liteflow:
     mode: sub
     pollingInterval: 5
     pollingStartTime: 1
-    chainDataBase: 0
+    chainDataBase: 1
     chainKey: chains
     #如果你没有脚本组件，以下可以不配置
-    scriptDataBase: 0
+    scriptDataBase: 1
     scriptKey: scripts
