@@ -1,9 +1,7 @@
 package com.yunext.core.context;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author ：qianjb [qianjb@hadlinks.com]
@@ -16,13 +14,13 @@ public class MainContext {
     private String topic;
     private Map<Object, Object> payload;
 
-    private final List<SubContext> subContexts;
+    private final Map<String, List<SubContext>> subContextMap;
 
     public MainContext() {
-        subContexts = Collections.synchronizedList(new ArrayList<>());
+        subContextMap = new ConcurrentHashMap<>();
     }
 
-    public SubContext copyToSub() {
+    public SubContext copyToSubContext() {
         SubContext subContext = new SubContext();
         subContext.setId(this.id);
         subContext.setTopic(this.topic);
@@ -54,7 +52,11 @@ public class MainContext {
         this.payload = payload;
     }
 
-    public List<SubContext> getSubContexts() {
-        return subContexts;
+    public List<SubContext> getSubContext(String cmpId) {
+        return Optional.ofNullable(this.subContextMap.get(cmpId)).orElse(new ArrayList<>());
+    }
+
+    public void setSubContext(String cmpId, List<SubContext> subContextList) {
+        this.subContextMap.put(cmpId, subContextList);
     }
 }

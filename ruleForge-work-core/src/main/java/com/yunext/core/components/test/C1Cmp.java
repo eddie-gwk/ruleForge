@@ -2,6 +2,7 @@ package com.yunext.core.components.test;
 
 import com.yomahub.liteflow.annotation.LiteflowComponent;
 import com.yomahub.liteflow.core.NodeComponent;
+import com.yunext.core.context.SubContext;
 import com.yunext.core.isolation.IsolationNodeComponent;
 
 /**
@@ -13,7 +14,7 @@ import com.yunext.core.isolation.IsolationNodeComponent;
 public class C1Cmp extends IsolationNodeComponent {
 
     @Override
-    public void process() throws Exception {
+    public void process(SubContext subContext) throws Exception {
         System.out.println("执行C, Thread: " + Thread.currentThread().getName());
     }
 }

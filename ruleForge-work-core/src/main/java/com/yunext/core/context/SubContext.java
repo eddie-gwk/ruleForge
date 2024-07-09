@@ -13,6 +13,14 @@ public class SubContext {
     private String topic;
     private Map<Object, Object> payload;
 
+    public SubContext copy() {
+        SubContext subContext = new SubContext();
+        subContext.setId(this.id);
+        subContext.setTopic(this.topic);
+        subContext.setPayload(this.payload);
+        return subContext;
+    }
+
 
     public String getId() {
         return id;
