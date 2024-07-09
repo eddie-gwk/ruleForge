@@ -1,5 +1,6 @@
 package com.yunext.node.struct.tree;
 
+import com.yomahub.liteflow.builder.el.ELWrapper;
 import com.yunext.common.base.BasicNode;
 
 import java.util.ArrayList;
@@ -14,15 +15,12 @@ public class RuleTreeNode {
 
     public RuleTreeNode(BasicNode basicNode) {
         this.value = basicNode;
-        this.dslList = new ArrayList<>();
         this.children = new ArrayList<>();
     }
 
     private BasicNode value;
 
-    private String command;
-
-    private final List<String> dslList;
+    private ELWrapper command;
 
     private List<RuleTreeNode> children;
 
@@ -34,11 +32,11 @@ public class RuleTreeNode {
         this.value = value;
     }
 
-    public String getCommand() {
+    public ELWrapper getCommand() {
         return command;
     }
 
-    public void setCommand(String command) {
+    public void setCommand(ELWrapper command) {
         this.command = command;
     }
 
@@ -48,9 +46,5 @@ public class RuleTreeNode {
 
     public void setChildren(List<RuleTreeNode> children) {
         this.children = children;
-    }
-
-    public List<String> getDslList() {
-        return dslList;
     }
 }

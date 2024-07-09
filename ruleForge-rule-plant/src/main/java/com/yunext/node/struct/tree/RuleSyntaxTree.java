@@ -1,5 +1,9 @@
 package com.yunext.node.struct.tree;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.yomahub.liteflow.builder.el.ELBus;
+import com.yomahub.liteflow.builder.el.ELWrapper;
+import com.yomahub.liteflow.builder.el.NodeELWrapper;
 import com.yunext.api.dto.RuleSyntaxTreeDto;
 import com.yunext.common.base.BasicNode;
 import com.yunext.common.enums.ComponentEnum;
@@ -23,7 +27,7 @@ public class RuleSyntaxTree {
      * 规则链名称
      * 一个语法树对象就是一个规则链
      */
-    private String chainName;
+    private String chainId;
 
     /**
      * 根节点
@@ -35,6 +39,8 @@ public class RuleSyntaxTree {
 
     public RuleSyntaxTree(RuleTreeNode root) {
         this.root = root;
+        this.chainId = StringUtil.isNotEmpty(root.getValue().getChainId()) ?
+                root.getValue().getChainId() : StringUtil.randomString(10);
     }
 
     /**
@@ -104,7 +110,7 @@ public class RuleSyntaxTree {
 
     public RuleSyntaxTreeDto toDto() {
         RuleSyntaxTreeDto ruleSyntaxTreeDto = new RuleSyntaxTreeDto();
-        ruleSyntaxTreeDto.setChain(this.chainName);
+        ruleSyntaxTreeDto.setChain(this.getChainId());
         ruleSyntaxTreeDto.setRuleDsl(this.getRuleDsl());
         return ruleSyntaxTreeDto;
     }
@@ -116,7 +122,7 @@ public class RuleSyntaxTree {
      */
     public String getRuleDsl() {
         this.deepRecursion(root);
-        return root.getCommand() + ";";
+        return root.getCommand().toEL();
     }
 
 
@@ -130,8 +136,9 @@ public class RuleSyntaxTree {
 
         List<RuleTreeNode> children = root.getChildren();
         if (CollectionUtils.isEmpty(children)) {
-            //叶子节点的命令就是组件名称
-            root.setCommand(component.name());
+            //叶子节点的命令就是组件名称,节点自身还需要带一个上下文
+            root.setCommand(ELBus.node(component.name())
+                    .data(node.getComponent() + StringUtil.randomString(5), this.nodeData(node)));
             return ;
         }
 
@@ -139,38 +146,50 @@ public class RuleSyntaxTree {
             deepRecursion(child);
         }
 
-        if (NodeTypeEnum.isSelect(type.name())) {
-            //选择分支，要根据输出口和导线组进行tag语法的设置
-            //TODO 没有做严格的校验，目前只是实现语法解析功能
-            //TODO 用ELBUS
-            String[][] wires = node.getWires();
-            Map<String, RuleTreeNode> treeNodeMap = children.stream().collect(Collectors.toMap(k -> k.getValue().getId(), v -> v));
-            List<String> subRules = new ArrayList<>();
-            for (int i = 0; i < wires.length; i++) {
-                //一维数组就是对输出接口的分组，下面的组件都是并行编排
-                List<RuleTreeNode> subNodes = new ArrayList<>();
-                for (String w : wires[i]) {
-                    subNodes.add(treeNodeMap.get(w));
+        String nodeDataName = node.getComponent() + StringUtil.randomString(5);
+        switch (NodeTypeEnum.getByName(type.name())) {
+            case select -> {
+                //选择节点，要根据输出口和导线组进行tag语法的设置
+                //TODO 没有做严格的校验，目前只是实现语法解析功能
+                List<List<String>> wires = node.getWires();
+                Map<String, RuleTreeNode> treeNodeMap = children.stream().collect(Collectors.toMap(k -> k.getValue().getId(), v -> v));
+                List<ELWrapper> subRules = new ArrayList<>();
+                for (int i = 0; i < wires.size(); i++) {
+                    //一维数组就是对输出口(子分支)的分组
+                    List<RuleTreeNode> subNodes = new ArrayList<>();
+                    for (String w : wires.get(i)) {
+                        subNodes.add(treeNodeMap.get(w));
+                    }
+                    //为每个输出口(子分支)创建tag, 如果某个输出口的子节点大于1，进行并行编排(when)
+                    Object[] array = subNodes.stream().map(RuleTreeNode::getCommand).toArray();
+                    //这里默认约定传的输出组应和tags一一对应，否则将导致执行错误
+                    String tag = node.getContextData().getTags().get(i);
+                    subRules.add(subNodes.size() > 1 ? ELBus.when(array).tag(tag) : subNodes.get(0).getCommand().tag(tag));
                 }
-                String subRule = String.format((subNodes.size() > 1 ? "WHEN(%s).tag(%s)" : "%s.tag(%s)"), subNodes.stream().map(RuleTreeNode::getCommand).collect(Collectors.joining(",")),
-                        StringUtil.randomString(5) + "-" + i);
-                subRules.add(subRule);
+                root.setCommand(
+                        ELBus.switchOpt(
+                        ELBus.node(component.name())
+                                .data(nodeDataName, this.nodeData(node)))
+                        .to(subRules.toArray())
+                );
             }
-            root.setCommand(String.format("SWITCH(%s).to(%s)", component, String.join(",", subRules)));
-        } else {
-            if (children.size() > 1) {
-                root.setCommand(String.format("THEN(%s, WHEN(%s))", component,
-                        children.stream().map(RuleTreeNode::getCommand).collect(Collectors.joining(","))));
-            } else {
-                root.setCommand(String.format("THEN(%s, %s)", component, children.get(0).getCommand()));
+            case input, output, ordinary, iterate, loop, virtual  -> {
+                //子节点数 > 1，要使用并行编排(when)，否则使用串行编排(then)
+                NodeELWrapper currNode = ELBus.node(component.name()).data(nodeDataName, this.nodeData(node));
+                ELWrapper elWrapper = children.size() > 1 ? ELBus.then(currNode, ELBus.when(children.stream().map(RuleTreeNode::getCommand).toArray()))
+                        : ELBus.then(currNode, children.get(0).getCommand());
+                root.setCommand(elWrapper);
             }
+            case unknown -> throw new RuntimeException("unknown node");
         }
-
-
     }
 
-    public String getChainName() {
-        return chainName;
+    private String nodeData(BasicNode node) {
+        return JSONObject.toJSONString(node.getContextData());
+    }
+
+    public String getChainId() {
+        return chainId;
     }
 
     /**

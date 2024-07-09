@@ -52,7 +52,11 @@ public class BasicNode implements Serializable {
      * 数组内容是节点id
      * 如果包含自己的id,通常会报错
      */
-    private String[][] wires;
+    private List<List<String>> wires;
+    /**
+     * 组件参数
+     */
+    private ComponentContextData contextData;
 
     public String getId() {
         return id;
@@ -118,12 +122,20 @@ public class BasicNode implements Serializable {
         this.outputs = outputs;
     }
 
-    public String[][] getWires() {
+    public List<List<String>> getWires() {
         return wires;
     }
 
-    public void setWires(String[][] wires) {
+    public void setWires(List<List<String>> wires) {
         this.wires = wires;
+    }
+
+    public ComponentContextData getContextData() {
+        return contextData;
+    }
+
+    public void setContextData(ComponentContextData contextData) {
+        this.contextData = contextData;
     }
 
     @Override

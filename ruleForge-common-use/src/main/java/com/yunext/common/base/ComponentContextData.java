@@ -1,16 +1,19 @@
-package com.yunext.core.context;
+package com.yunext.common.base;
 
 import com.alibaba.fastjson2.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 组件参数
+ * @notice 需要和ComponentContext结构保持一致
  * @author ：qianjb [qianjb@hadlinks.com]
- * @description ：组件上下文
- * @date ：Created in 2024/7/9 13:10
+ * @description ：
+ * @date ：Created in 2024/7/9 14:58
  */
-public class ComponentContext implements Serializable {
+public class ComponentContextData implements Serializable {
 
     /**
      * 组件id
@@ -59,5 +62,11 @@ public class ComponentContext implements Serializable {
 
     public void setRules(List<JSONObject> rules) {
         this.rules = rules;
+    }
+
+    public void initList(int size) {
+        this.subCmpId = new ArrayList<>(size);
+        this.tags = new ArrayList<>(size);
+        this.rules = new ArrayList<>(size);
     }
 }

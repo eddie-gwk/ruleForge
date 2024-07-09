@@ -31,7 +31,7 @@ public class ChainNodeServiceImpl implements ChainNodeService {
             return ResultDto.success(new ArrayList<>());
         }
         ChainNodeUndirectedGraph<BasicNode> graph = new ChainNodeUndirectedGraph<>(basicNodeList, this.createEdges(basicNodeList));
-        //1.获取所有连通子图 (每个子图都是一个规则链)
+        //1.获取所有连通子图
         List<ChainNodeUndirectedGraph<BasicNode>> connectedSubGraph = graph.connectedSubGraphByDfs();
         //2.根据顶点数据生成有向图
         List<ChainNodeDirectedGraph<BasicNode>> directedGraphList = new ArrayList<>();
@@ -40,7 +40,7 @@ public class ChainNodeServiceImpl implements ChainNodeService {
             ChainNodeDirectedGraph<BasicNode> directedGraph = new ChainNodeDirectedGraph<>(allVertices, this.createEdges(allVertices));
             directedGraphList.add(directedGraph);
         });
-        //3.为有向图加虚拟根节点生成多叉语法树，根据语法树得到规则链
+        //3.为有向图生成语法树，根据语法树得到规则链
         List<RuleSyntaxTreeDto> ruleSyntaxTreeDtoList = new ArrayList<>();
         directedGraphList.forEach(directedGraph -> {
             List<RuleSyntaxTree> syntaxTreeList = RuleSyntaxTree.createTrees(directedGraph);
@@ -54,9 +54,9 @@ public class ChainNodeServiceImpl implements ChainNodeService {
         List<Pair<BasicNode, BasicNode>> edges = new ArrayList<>();
         Map<String, BasicNode> nodeMap = basicNodeList.stream().collect(Collectors.toMap(BasicNode::getId, v -> v));
         basicNodeList.forEach(node -> {
-            String[][] wires = node.getWires();
+            List<List<String>> wires = node.getWires();
             if(wires != null) {
-                List<String> wireList = Arrays.stream(wires).flatMap(Arrays::stream).toList();
+                List<String> wireList = wires.stream().flatMap(List::stream).toList();
                 for (String wire : wireList) {
                     if (wire.equals(node.getId())) {
                         throw new RuntimeException("nodes cannot connect themselves！");

@@ -135,6 +135,11 @@
                 <artifactId>liteflow-rule-redis</artifactId>
                 <version>${liteflow.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.yomahub</groupId>
+                <artifactId>liteflow-el-builder</artifactId>
+                <version>${liteflow.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -7,9 +7,7 @@ package com.yunext.common.enums;
  */
 public enum NodeTypeEnum {
     /**
-     * 虚拟根节点
-     * 该节点用于辅助语法树
-     * 在页面上没有实际意义
+     * 虚拟节点
      */
     virtual,
     /**
@@ -37,9 +35,22 @@ public enum NodeTypeEnum {
     /**
      * 迭代器组件
      */
-    iterate;
+    iterate,
+    /**
+     * 未知
+     */
+    unknown;
 
     public static boolean isSelect(String name) {
         return select.name().equals(name);
+    }
+
+    public static NodeTypeEnum getByName(String name) {
+        for (NodeTypeEnum value : values()) {
+            if (value.name().equals(name)) {
+                return value;
+            }
+        }
+        return unknown;
     }
 }
