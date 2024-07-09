@@ -82,6 +82,10 @@
             <groupId>com.yomahub</groupId>
             <artifactId>liteflow-rule-redis</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>

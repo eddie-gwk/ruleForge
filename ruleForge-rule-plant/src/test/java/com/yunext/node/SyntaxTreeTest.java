@@ -48,8 +48,8 @@ public class SyntaxTreeTest {
             for (ChainNodeUndirectedGraph<BasicNode> subGraph : subGraphs) {
                 List<BasicNode> allVertices = subGraph.getAllVertices();
                 ChainNodeDirectedGraph<BasicNode> directedGraph = new ChainNodeDirectedGraph<>(allVertices, this.createEdges(allVertices));
-                RuleSyntaxTree tree = new RuleSyntaxTree(directedGraph);
-                System.out.println(tree.getRuleDsl());
+                List<RuleSyntaxTree> trees = RuleSyntaxTree.createTrees(directedGraph);
+                trees.forEach(tree -> System.out.println(tree.getRuleDsl()));
             }
             return null;
         });

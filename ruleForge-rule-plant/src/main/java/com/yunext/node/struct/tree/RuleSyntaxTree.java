@@ -28,28 +28,33 @@ public class RuleSyntaxTree {
     /**
      * 根节点
      */
-    private final RuleTreeNode root;
+    private RuleTreeNode root;
 
     public RuleSyntaxTree() {
-        this.root = new RuleTreeNode(this.virtualNode());
+    }
+
+    public RuleSyntaxTree(RuleTreeNode root) {
+        this.root = root;
     }
 
     /**
-     * 构建语法树
+     * 构建语法树List
      * @param graph
      */
-    public RuleSyntaxTree(ChainNodeDirectedGraph<BasicNode> graph) {
-        //构建一个虚拟根节点，辅助算法的执行
-        this.root = new RuleTreeNode(this.virtualNode());
+    public static List<RuleSyntaxTree> createTrees(ChainNodeDirectedGraph<BasicNode> graph) {
+        List<RuleSyntaxTree> treeList = new ArrayList<>();
+        if (graph == null) {
+            return treeList;
+        }
         graph.calcRoot();
         Map<BasicNode, Boolean> visited = graph.createVisited();
         Map<String, RuleTreeNode> treeNodeMap = new HashMap<>();
         //从图的多个起点出发构建语法树，最终都作为虚拟根节点的子节点
         graph.getRoots().forEach(graphRoot -> {
             RuleTreeNode root = bfs(graphRoot, visited, treeNodeMap, graph);
-            this.root.getChildren().add(root);
+            treeList.add(new RuleSyntaxTree(root));
         });
-
+        return treeList;
     }
 
     /**
@@ -64,7 +69,7 @@ public class RuleSyntaxTree {
         return basicNode;
     }
 
-    private RuleTreeNode bfs(BasicNode start, Map<BasicNode, Boolean> visited, Map<String, RuleTreeNode> treeNodeMap, ChainNodeDirectedGraph<BasicNode> graph) {
+    private static RuleTreeNode bfs(BasicNode start, Map<BasicNode, Boolean> visited, Map<String, RuleTreeNode> treeNodeMap, ChainNodeDirectedGraph<BasicNode> graph) {
         Deque<BasicNode> queue = new ArrayDeque<>();
 
         //标记已访问
@@ -147,8 +152,8 @@ public class RuleSyntaxTree {
                 for (String w : wires[i]) {
                     subNodes.add(treeNodeMap.get(w));
                 }
-                String subRule = String.format("WHEN(%s).tag(%s)", subNodes.stream().map(RuleTreeNode::getCommand).collect(Collectors.joining(",")),
-                        node.getId() + i);
+                String subRule = String.format((subNodes.size() > 1 ? "WHEN(%s).tag(%s)" : "%s.tag(%s)"), subNodes.stream().map(RuleTreeNode::getCommand).collect(Collectors.joining(",")),
+                        StringUtil.randomString(5) + "-" + i);
                 subRules.add(subRule);
             }
             root.setCommand(String.format("SWITCH(%s).to(%s)", component, String.join(",", subRules)));

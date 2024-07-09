@@ -43,8 +43,8 @@ public class ChainNodeServiceImpl implements ChainNodeService {
         //3.为有向图加虚拟根节点生成多叉语法树，根据语法树得到规则链
         List<RuleSyntaxTreeDto> ruleSyntaxTreeDtoList = new ArrayList<>();
         directedGraphList.forEach(directedGraph -> {
-            RuleSyntaxTree syntaxTree = new RuleSyntaxTree(directedGraph);
-            ruleSyntaxTreeDtoList.add(syntaxTree.toDto());
+            List<RuleSyntaxTree> syntaxTreeList = RuleSyntaxTree.createTrees(directedGraph);
+            syntaxTreeList.forEach(syntaxTree -> ruleSyntaxTreeDtoList.add(syntaxTree.toDto()));
         });
         return ResultDto.success(ruleSyntaxTreeDtoList);
     }
