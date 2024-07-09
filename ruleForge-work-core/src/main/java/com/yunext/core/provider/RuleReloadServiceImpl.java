@@ -30,11 +30,12 @@ public class RuleReloadServiceImpl implements RuleReloadService {
         }
         RMapCache<Object, Object> chainRule = redissonClient.getMapCache("chain_rules");
         //验证DSL是否合法,不合法直接删除，不让执行
-        boolean validate = LiteFlowChainELBuilder.validate(rule);
+        boolean validate = LiteFlowChainELBuilder.validate(StringUtil.removeWhitespace(rule));
         if (validate) {
             chainRule.put(chain, rule);
         } else {
             chainRule.remove(chain);
+            return ResultDto.fail(String.format("syntax error, chain [%s] will not execute.", chain));
         }
 
         return ResultDto.success();

@@ -10,13 +10,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 隔离上下文的普通组件
  * @author ：qianjb [qianjb@hadlinks.com]
- * @description ：线程隔离节点
+ * @description ：
  * @date ：Created in 2024/7/8 10:02
  */
-public abstract class IsolationNodeComponent extends NodeComponent {
+public abstract class IsolationNodeComponent extends IsolationComponent {
 
-    private final ThreadLocal<List<SubContext>> indexLocal = new ThreadLocal<>();
+    public IsolationNodeComponent() {
+        super();
+    }
 
     public abstract void process(SubContext subContext) throws Exception;
 
@@ -31,40 +34,4 @@ public abstract class IsolationNodeComponent extends NodeComponent {
         });
     }
 
-    @Override
-    public void beforeProcess() {
-        super.beforeProcess();
-        ComponentContext cmpData = this.getCmpData(ComponentContext.class);
-        if (cmpData == null) {
-            return;
-        }
-        MainContext mainContext = this.getContextBean(MainContext.class);
-        List<SubContext> subContextList = mainContext.getSubContext(cmpData.getCmpId());
-        if (CollectionUtils.isEmpty(subContextList)) {
-            subContextList.add(mainContext.copyToSubContext());
-        }
-        //进行一个拷贝，不要对原数据进行修改
-        List<SubContext> copySubContextList = subContextList.stream().map(SubContext::copy).toList();
-        indexLocal.set(copySubContextList);
-    }
-
-    @Override
-    public void afterProcess() {
-        ComponentContext cmpData = this.getCmpData(ComponentContext.class);
-        if (cmpData == null) {
-            return;
-        }
-        MainContext mainContext = this.getContextBean(MainContext.class);
-        cmpData.getSubCmpId().forEach(subCmpId -> mainContext.setSubContext(subCmpId, indexLocal.get()));
-        indexLocal.remove();
-        super.afterProcess();
-    }
-
-    public List<SubContext> getLocalSubContext() {
-        return indexLocal.get();
-    }
-
-    public void setLocalSubContext(List<SubContext> subContextList) {
-        indexLocal.set(subContextList);
-    }
 }
