@@ -55,10 +55,10 @@ public class SyntaxTreeTest {
     @Test
     public void testTreeCreate() {
         this.createAndExecute(graph -> {
-            List<ChainNodeUndirectedGraph<BasicNode>> subGraphs = graph.connectedSubGraphByDfs();
-            for (ChainNodeUndirectedGraph<BasicNode> subGraph : subGraphs) {
-                List<BasicNode> allVertices = subGraph.getAllVertices();
-                ChainNodeDirectedGraph<BasicNode> directedGraph = new ChainNodeDirectedGraph<>(allVertices, this.createEdges(allVertices));
+            List<ChainNodeUndirectedGraph<BasicNode<?, ?>>> subGraphs = graph.connectedSubGraphByDfs();
+            for (ChainNodeUndirectedGraph<BasicNode<?, ?>> subGraph : subGraphs) {
+                List<BasicNode<?, ?>> allVertices = subGraph.getAllVertices();
+                ChainNodeDirectedGraph<BasicNode<?, ?>> directedGraph = new ChainNodeDirectedGraph<>(allVertices, this.createEdges(allVertices));
                 List<RuleSyntaxTree> trees = RuleSyntaxTree.createTrees(directedGraph);
                 trees.forEach(tree -> System.out.println(tree.getRuleDsl()));
             }
@@ -69,10 +69,10 @@ public class SyntaxTreeTest {
     @Test
     public void testWorkCore() {
         this.createAndExecute(graph -> {
-            List<ChainNodeUndirectedGraph<BasicNode>> subGraphs = graph.connectedSubGraphByDfs();
-            for (ChainNodeUndirectedGraph<BasicNode> subGraph : subGraphs) {
-                List<BasicNode> allVertices = subGraph.getAllVertices();
-                ChainNodeDirectedGraph<BasicNode> directedGraph = new ChainNodeDirectedGraph<>(allVertices, this.createEdges(allVertices));
+            List<ChainNodeUndirectedGraph<BasicNode<?, ?>>> subGraphs = graph.connectedSubGraphByDfs();
+            for (ChainNodeUndirectedGraph<BasicNode<?, ?>> subGraph : subGraphs) {
+                List<BasicNode<?, ?>> allVertices = subGraph.getAllVertices();
+                ChainNodeDirectedGraph<BasicNode<?, ?>> directedGraph = new ChainNodeDirectedGraph<>(allVertices, this.createEdges(allVertices));
                 List<RuleSyntaxTree> trees = RuleSyntaxTree.createTrees(directedGraph);
                 trees.forEach(tree -> {
                     ruleReloadService.reload(tree.getChainId(), tree.getRuleDsl());
@@ -84,7 +84,7 @@ public class SyntaxTreeTest {
     }
 
 
-    private <T> void createAndExecute(Function<ChainNodeUndirectedGraph<BasicNode>, Void> fuc) {
+    private <T> void createAndExecute(Function<ChainNodeUndirectedGraph<BasicNode<?, ?>>, Void> fuc) {
         int count = 0;
         JSONArray testData = JSONArray.parseArray(TEST_DATA);
         for (Object data : testData) {
@@ -93,9 +93,9 @@ public class SyntaxTreeTest {
                 JSONArray vertices = obj.getJSONArray("vertices");
                 JSONArray edges = obj.getJSONArray("edges");
 
-                List<BasicNode> basicNodeList = new ArrayList<>();
+                List<BasicNode<?, ?>> basicNodeList = new ArrayList<>();
                 for (String vertex : vertices.toList(String.class)) {
-                    BasicNode basicNode = new BasicNode();
+                    BasicNode<?, ?> basicNode = new BasicNode<>();
                     basicNode.setId(vertex);
                     basicNode.setType("F1".equals(vertex) ? NodeTypeEnum.select : NodeTypeEnum.ordinary);
                     basicNode.setComponent(ComponentEnum.getByName(vertex));
@@ -105,20 +105,20 @@ public class SyntaxTreeTest {
                     basicNode.setContextData(contextData);
                     basicNodeList.add(basicNode);
                 }
-                Map<String, BasicNode> nodeMap = basicNodeList.stream().collect(Collectors.toMap(BasicNode::getId, v -> v));
-                List<Pair<BasicNode, BasicNode>> edgeList = new ArrayList<>();
+                Map<String, BasicNode<?, ?>> nodeMap = basicNodeList.stream().collect(Collectors.toMap(BasicNode::getId, v -> v));
+                List<Pair<BasicNode<?, ?>, BasicNode<?, ?>>> edgeList = new ArrayList<>();
                 Map<String, List<List<String>>> wiresMap = new HashMap<>();
                 for (Object edge : edges) {
                     if (edge instanceof JSONArray e) {
                         edgeList.add(new Pair<>(nodeMap.get(e.getString(0)), nodeMap.get(e.getString(1))));
-                        BasicNode start = nodeMap.get(e.getString(0));
+                        BasicNode<?, ?> start = nodeMap.get(e.getString(0));
                         List<List<String>> wireList = Optional.ofNullable(wiresMap.get(start.getId())).orElse(new ArrayList<>());
                         wireList.add(Lists.newArrayList(e.getString(1)));
                         wiresMap.put(start.getId(), wireList);
                     }
                 }
                 //设置每个顶点的导线
-                for (BasicNode basicNode : basicNodeList) {
+                for (BasicNode<?, ?> basicNode : basicNodeList) {
                     List<List<String>> wires = Optional.ofNullable(wiresMap.get(basicNode.getId())).orElse(new ArrayList<>());
                     //String[][] wiresArray = wires.stream().map(subList -> subList.toArray(new String[0])).toArray(String[][]::new);
                     basicNode.setWires(wires);
@@ -134,15 +134,15 @@ public class SyntaxTreeTest {
                         }
                     }
                 }
-                ChainNodeUndirectedGraph<BasicNode> adjTable = new ChainNodeUndirectedGraph<>(basicNodeList, edgeList);
+                ChainNodeUndirectedGraph<BasicNode<?, ?>> adjTable = new ChainNodeUndirectedGraph<>(basicNodeList, edgeList);
                 fuc.apply(adjTable);
             }
         }
     }
 
-    private List<Pair<BasicNode, BasicNode>> createEdges(List<BasicNode> basicNodeList) {
-        List<Pair<BasicNode, BasicNode>> edges = new ArrayList<>();
-        Map<String, BasicNode> nodeMap = basicNodeList.stream().collect(Collectors.toMap(BasicNode::getId, v -> v));
+    private List<Pair<BasicNode<?, ?>, BasicNode<?, ?>>> createEdges(List<BasicNode<?, ?>> basicNodeList) {
+        List<Pair<BasicNode<?, ?>, BasicNode<?, ?>>> edges = new ArrayList<>();
+        Map<String, BasicNode<?, ?>> nodeMap = basicNodeList.stream().collect(Collectors.toMap(BasicNode::getId, v -> v));
         basicNodeList.forEach(node -> {
             List<List<String>> wires = node.getWires();
             if(wires != null) {
@@ -151,7 +151,7 @@ public class SyntaxTreeTest {
                     if (wire.equals(node.getId())) {
                         throw new RuntimeException("nodes cannot connect themselves！");
                     }
-                    BasicNode subNode = nodeMap.get(wire);
+                    BasicNode<?, ?> subNode = nodeMap.get(wire);
                     if (subNode == null) {
                         throw new RuntimeException("unknown nodes id :" + wire);
                     }

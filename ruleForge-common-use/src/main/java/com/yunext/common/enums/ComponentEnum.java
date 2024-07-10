@@ -8,9 +8,27 @@ package com.yunext.common.enums;
  */
 public enum ComponentEnum {
 
+    /**
+     * 注入
+     */
+    inject,
+    /**
+     * 变更
+     */
+    change,
+    /**
+     * 过滤
+     */
+    filter,
+    /**
+     * 调试
+     */
+    debug,
+
     //仅供测试使用
     A1,B1,C1,D1,E1,F1,G1,H1,I1,
-    UNDEFINED, ROOT;
+    none,
+    UNDEFINED;
 
     public static ComponentEnum getByName(String name) {
         for (ComponentEnum value : values()) {

@@ -13,22 +13,22 @@ import java.util.List;
  */
 public class RuleTreeNode {
 
-    public RuleTreeNode(BasicNode basicNode) {
+    public RuleTreeNode(BasicNode<?, ?> basicNode) {
         this.value = basicNode;
         this.children = new ArrayList<>();
     }
 
-    private BasicNode value;
+    private BasicNode<?, ?> value;
 
     private ELWrapper command;
 
     private List<RuleTreeNode> children;
 
-    public BasicNode getValue() {
+    public BasicNode<?, ?> getValue() {
         return value;
     }
 
-    public void setValue(BasicNode value) {
+    public void setValue(BasicNode<?, ?> value) {
         this.value = value;
     }
 

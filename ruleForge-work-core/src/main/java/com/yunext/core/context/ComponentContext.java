@@ -28,6 +28,10 @@ public class ComponentContext implements Serializable {
      * 组件规则
      */
     private List<JSONObject> rules;
+    /**
+     * 输入参数
+     */
+    private List<JSONObject> props;
 
     public String getCmpId() {
         return cmpId;
@@ -59,5 +63,13 @@ public class ComponentContext implements Serializable {
 
     public void setRules(List<JSONObject> rules) {
         this.rules = rules;
+    }
+
+    public List<JSONObject> getProps() {
+        return props;
+    }
+
+    public void setProps(List<JSONObject> props) {
+        this.props = props;
     }
 }

@@ -8,6 +8,10 @@ import com.yunext.core.context.ComponentContext;
 import com.yunext.core.context.SubContext;
 import com.yunext.core.isolation.IsolationNodeComponent;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * @author ：qianjb [qianjb@hadlinks.com]
  * @description ：
@@ -18,9 +22,10 @@ public class A1Cmp extends IsolationNodeComponent {
     @Override
     public void process(SubContext subContext) throws Exception {
         ComponentContext cmpData = this.getCmpData(ComponentContext.class);
-        String topic = subContext.getTopic();
-        subContext.setTopic(topic + ":"  + StringUtil.randomNumberString(2));
+        Map<Object, Object> msg = Optional.ofNullable(subContext.getMsg()).orElse(new HashMap<>());
+        String topic = (String) Optional.ofNullable(msg.get("topic")).orElse("");
+        subContext.getMsg().put("topic", topic + ":"  + StringUtil.randomNumberString(2));
         System.out.println("执行A, Thread: " + Thread.currentThread().getName());
-        System.out.printf("组件ID :%s,  topic: %s \n",cmpData.getCmpId(), subContext.getTopic());
+        System.out.printf("组件ID :%s,  topic: %s \n",cmpData.getCmpId(), subContext.getMsg().get("topic"));
     }
 }

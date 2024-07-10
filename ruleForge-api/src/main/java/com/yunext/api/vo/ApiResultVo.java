@@ -1,33 +1,35 @@
-package com.yunext.common.base;
+package com.yunext.api.vo;
 
 
+import com.yunext.api.dto.ResultDto;
+import com.yunext.api.constant.ResultApiCode;
 import com.yunext.common.utils.StringUtil;
 
-public class ApiResult<T> {
+public class ApiResultVo<T> {
     private int code;
     //使用国际化时开启
     private String msg;
     private T data;
     private boolean success;
 
-    public ApiResult() {
+    public ApiResultVo() {
     }
 
-    public ApiResult(ResultApiCode resultApiCode) {
+    public ApiResultVo(ResultApiCode resultApiCode) {
         this.code = resultApiCode.getCode();
         this.msg = resultApiCode.getMsg();
         this.success = resultApiCode.isSuccess();
     }
 
-    public static ApiResult result(ResultDto resultDto) {
+    public static ApiResultVo result(ResultDto resultDto) {
         if (resultDto.isSuccess()) {
-            ApiResult apiResult = new ApiResult(ResultApiCode.SUCCESS);
+            ApiResultVo apiResult = new ApiResultVo(ResultApiCode.SUCCESS);
             if (resultDto.getData() != null) {
                 apiResult.setData(resultDto.getData());
             }
             return apiResult;
         } else {
-            ApiResult apiResult = new ApiResult(ResultApiCode.ERROR);
+            ApiResultVo apiResult = new ApiResultVo(ResultApiCode.ERROR);
             if (StringUtil.isNotEmpty(resultDto.getErrMsg())) {
                 apiResult.setMsg(resultDto.getErrMsg());
             }
@@ -35,45 +37,45 @@ public class ApiResult<T> {
         }
     }
 
-    public static ApiResult success(Object data) {
-        ApiResult apiResult = new ApiResult(ResultApiCode.SUCCESS);
+    public static <T> ApiResultVo<T> success(T data) {
+        ApiResultVo<T> apiResult = new ApiResultVo<>(ResultApiCode.SUCCESS);
         apiResult.setData(data);
         return apiResult;
     }
 
-    public static ApiResult success(String message, Object data) {
-        ApiResult apiResult = new ApiResult(ResultApiCode.SUCCESS);
+    public static ApiResultVo success(String message, Object data) {
+        ApiResultVo apiResult = new ApiResultVo(ResultApiCode.SUCCESS);
         apiResult.setData(data);
         apiResult.setMsg(message);
         return apiResult;
     }
 
-    public static ApiResult fail(String message) {
-        ApiResult apiResult = new ApiResult(ResultApiCode.ERROR);
+    public static ApiResultVo fail(String message) {
+        ApiResultVo apiResult = new ApiResultVo(ResultApiCode.ERROR);
         if(message.length()<100){
             apiResult.setMsg(message);
         }
         return apiResult;
     }
 
-    public static ApiResult fail(Object obj) {
-        ApiResult apiResult = new ApiResult(ResultApiCode.ERROR);
+    public static ApiResultVo fail(Object obj) {
+        ApiResultVo apiResult = new ApiResultVo(ResultApiCode.ERROR);
         apiResult.setData(obj);
         return apiResult;
     }
 
-    public static ApiResult fail() {
-        ApiResult apiResult = new ApiResult(ResultApiCode.ERROR);
+    public static ApiResultVo fail() {
+        ApiResultVo apiResult = new ApiResultVo(ResultApiCode.ERROR);
         return apiResult;
     }
 
-    public static ApiResult fail(ResultApiCode code) {
-        return new ApiResult(code);
+    public static ApiResultVo fail(ResultApiCode code) {
+        return new ApiResultVo(code);
     }
 
 
-    public static ApiResult success() {
-        ApiResult apiResult = new ApiResult(ResultApiCode.SUCCESS);
+    public static ApiResultVo success() {
+        ApiResultVo apiResult = new ApiResultVo(ResultApiCode.SUCCESS);
         return apiResult;
     }
 

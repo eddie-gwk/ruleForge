@@ -1,12 +1,15 @@
 package com.yunext.core.isolation;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.yomahub.liteflow.core.NodeComponent;
+import com.yunext.common.utils.ModelMapperUtil;
 import com.yunext.core.context.ComponentContext;
 import com.yunext.core.context.MainContext;
 import com.yunext.core.context.SubContext;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +35,30 @@ public abstract class IsolationNodeComponent extends IsolationComponent {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    /**
+     * 不区分规则组的组件规则
+     * @param clazz
+     * @return
+     * @param <T>
+     */
+    public <T> List<T> getRuleList(Class<T> clazz) {
+        ComponentContext cmpData = this.getCmpData(ComponentContext.class);
+        return Optional.ofNullable(cmpData)
+                .map(ComponentContext::getRules)
+                .stream()
+                .map(r -> ModelMapperUtil.map(r, clazz))
+                .toList();
+    }
+
+    public <T> T getProp(int index, Class<T> clazz) {
+        ComponentContext cmpData = this.getCmpData(ComponentContext.class);
+        return Optional.ofNullable(cmpData)
+                .map(ComponentContext::getProps)
+                .map(p -> p.get(index))
+                .map(p -> ModelMapperUtil.map(p, clazz))
+                .orElse(null);
     }
 
 }

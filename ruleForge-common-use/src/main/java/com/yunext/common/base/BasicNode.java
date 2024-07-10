@@ -1,7 +1,9 @@
 package com.yunext.common.base;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.yunext.common.enums.ComponentEnum;
 import com.yunext.common.enums.NodeTypeEnum;
+import com.yunext.common.node.Rule;
 
 import java.io.Serializable;
 import java.util.List;
@@ -9,10 +11,10 @@ import java.util.Map;
 
 /**
  * @author ：qianjb [qianjb@hadlinks.com]
- * @description ：基本节点
+ * @description ：节点基本结构
  * @date ：Created in 2024/7/2 15:14
  */
-public class BasicNode implements Serializable {
+public class BasicNode<P, R> implements Serializable {
     /**
      * 节点id
      */
@@ -28,9 +30,13 @@ public class BasicNode implements Serializable {
      */
     private ComponentEnum component;
     /**
-     * 输出口
+     * 输入属性
      */
-    private Map<String, Object>[] outputs;
+    private List<P> props;
+    /**
+     * 自定义规则
+     */
+    private List<R> rules;
     /**
      * 节点名称
      */
@@ -82,6 +88,22 @@ public class BasicNode implements Serializable {
         this.component = component;
     }
 
+    public List<P> getProps() {
+        return props;
+    }
+
+    public void setProps(List<P> props) {
+        this.props = props;
+    }
+
+    public List<R> getRules() {
+        return rules;
+    }
+
+    public void setRules(List<R> rules) {
+        this.rules = rules;
+    }
+
     public String getName() {
         return name;
     }
@@ -114,14 +136,6 @@ public class BasicNode implements Serializable {
         this.chainId = chainId;
     }
 
-    public Map<String, Object>[] getOutputs() {
-        return outputs;
-    }
-
-    public void setOutputs(Map<String, Object>[] outputs) {
-        this.outputs = outputs;
-    }
-
     public List<List<String>> getWires() {
         return wires;
     }
@@ -151,7 +165,7 @@ public class BasicNode implements Serializable {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        BasicNode basicNode = (BasicNode) obj;
+        BasicNode<?, ?> basicNode = (BasicNode<?, ?>) obj;
         return basicNode.getId().equals(this.getId());
     }
 

@@ -1,7 +1,7 @@
 package com.yunext.api.service.reload;
 
 import com.yunext.api.dto.RuleSyntaxTreeDto;
-import com.yunext.common.base.ResultDto;
+import com.yunext.api.dto.ResultDto;
 
 import java.util.List;
 

@@ -87,6 +87,7 @@ public class ChainNodeUndirectedGraph<N> extends AbstractChainNodeGraph<N> {
      * @param vertex 顶点
      * @return
      */
+    @Override
     public List<N> getAdjVertices(N vertex) {
         return Optional.ofNullable(this.adjList.get(vertex)).orElse(new LinkedList<>());
     }

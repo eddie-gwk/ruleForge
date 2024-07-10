@@ -1,4 +1,4 @@
-package com.yunext.common.base;
+package com.yunext.api.constant;
 
 
 

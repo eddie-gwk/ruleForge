@@ -10,9 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MainContext {
 
-    private String id;
-    private String topic;
-    private Map<Object, Object> payload;
+    private Date timestamp;
+    private Map<Object, Object> msg;
 
     private final Map<String, List<SubContext>> subContextMap;
 
@@ -22,34 +21,26 @@ public class MainContext {
 
     public SubContext copyToSubContext() {
         SubContext subContext = new SubContext();
-        subContext.setId(this.id);
-        subContext.setTopic(this.topic);
-        subContext.setPayload(this.payload);
+        subContext.setTimestamp(this.timestamp);
+        subContext.setRuleIndex(0);
+        subContext.setMsg(this.msg);
         return subContext;
     }
 
-    public String getId() {
-        return id;
+    public Date getTimestamp() {
+        return timestamp;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public String getTopic() {
-        return topic;
+    public Map<Object, Object> getMsg() {
+        return msg;
     }
 
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
-    public Map<Object, Object> getPayload() {
-        return payload;
-    }
-
-    public void setPayload(Map<Object, Object> payload) {
-        this.payload = payload;
+    public void setMsg(Map<Object, Object> msg) {
+        this.msg = msg;
     }
 
     public List<SubContext> getSubContext(String cmpId) {

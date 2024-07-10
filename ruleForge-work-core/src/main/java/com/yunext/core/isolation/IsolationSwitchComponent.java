@@ -1,12 +1,14 @@
 package com.yunext.core.isolation;
 
 import com.yomahub.liteflow.core.NodeSwitchComponent;
+import com.yunext.common.utils.ModelMapperUtil;
 import com.yunext.core.context.ComponentContext;
 import com.yunext.core.context.MainContext;
 import com.yunext.core.context.SubContext;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 隔离上下文的选择组件
@@ -18,6 +20,8 @@ import java.util.List;
  * @date ：Created in 2024/7/9 14:13
  */
 public abstract class IsolationSwitchComponent extends NodeSwitchComponent {
+
+    protected final String DEFAULT_TAG = "none";
 
     private final ThreadLocal<List<SubContext>> indexLocal = new ThreadLocal<>();
 
@@ -79,5 +83,28 @@ public abstract class IsolationSwitchComponent extends NodeSwitchComponent {
     public final String processSwitch() throws Exception {
         //do nothing
         return null;
+    }
+
+    public <T> T getProp(int index, Class<T> clazz) {
+        ComponentContext cmpData = this.getCmpData(ComponentContext.class);
+        return Optional.ofNullable(cmpData)
+                .map(ComponentContext::getProps)
+                .map(p -> p.get(index))
+                .map(p -> ModelMapperUtil.map(p, clazz))
+                .orElse(null);
+    }
+
+    public <T> T getRule(int index, Class<T> clazz) {
+        ComponentContext cmpData = this.getCmpData(ComponentContext.class);
+        return Optional.ofNullable(cmpData)
+                .map(ComponentContext::getRules)
+                .map(r -> r.get(index))
+                .map(r -> ModelMapperUtil.map(r, clazz))
+                .orElse(null);
+    }
+
+    public String getTag(int index) {
+        ComponentContext cmpData = this.getCmpData(ComponentContext.class);
+        return cmpData.getTags().get(index);
     }
 }

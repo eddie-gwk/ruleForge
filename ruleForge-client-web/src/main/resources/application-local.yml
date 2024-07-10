@@ -14,6 +14,8 @@ dubbo:
     address: zookeeper://127.0.0.1:2181
     timeout: 20000
     simplified: true
+  scan:
+    base-packages: com/yunext/client/web/provider
 #  consumer:
 #    check: false
 #    version: 1.0

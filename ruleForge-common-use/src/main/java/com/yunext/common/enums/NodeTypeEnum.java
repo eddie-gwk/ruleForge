@@ -45,6 +45,10 @@ public enum NodeTypeEnum {
         return select.name().equals(name);
     }
 
+    public static boolean isOutput(String name) {
+        return output.name().equals(name);
+    }
+
     public static NodeTypeEnum getByName(String name) {
         for (NodeTypeEnum value : values()) {
             if (value.name().equals(name)) {

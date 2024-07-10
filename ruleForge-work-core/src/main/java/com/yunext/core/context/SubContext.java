@@ -1,5 +1,7 @@
 package com.yunext.core.context;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -9,40 +11,46 @@ import java.util.Map;
  */
 public class SubContext {
 
-    private String id;
-    private String topic;
-    private Map<Object, Object> payload;
+    private Date timestamp;
+    private int ruleIndex;
+    private Map<Object, Object> msg;
+
+    public SubContext() {
+        this.timestamp = new Date();
+        this.ruleIndex = 0;
+        this.msg = new HashMap<>();
+    }
 
     public SubContext copy() {
         SubContext subContext = new SubContext();
-        subContext.setId(this.id);
-        subContext.setTopic(this.topic);
-        subContext.setPayload(this.payload);
+        subContext.setTimestamp(new Date());
+        subContext.setRuleIndex(this.ruleIndex);
+        subContext.setMsg(this.msg);
         return subContext;
     }
 
 
-    public String getId() {
-        return id;
+    public Date getTimestamp() {
+        return timestamp;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public String getTopic() {
-        return topic;
+    public int getRuleIndex() {
+        return ruleIndex;
     }
 
-    public void setTopic(String topic) {
-        this.topic = topic;
+    public void setRuleIndex(int ruleIndex) {
+        this.ruleIndex = ruleIndex;
     }
 
-    public Map<Object, Object> getPayload() {
-        return payload;
+    public Map<Object, Object> getMsg() {
+        return msg;
     }
 
-    public void setPayload(Map<Object, Object> payload) {
-        this.payload = payload;
+    public void setMsg(Map<Object, Object> msg) {
+        this.msg = msg;
     }
 }

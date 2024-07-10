@@ -43,8 +43,15 @@ public abstract class IsolationComponent extends NodeComponent {
         }
         MainContext mainContext = this.getContextBean(MainContext.class);
         //设置子组件的下上文
-        cmpData.getSubCmpId().forEach(subCmpId ->
-                subCmpId.forEach(cmpId -> mainContext.setSubContext(cmpId, indexLocal.get())));
+        List<List<String>> subCmpId = cmpData.getSubCmpId();
+        for (int i = 0; i < subCmpId.size(); i++) {
+            List<String> cmpIdList = subCmpId.get(i);
+            //给上下文区分规则组
+            for (SubContext subContext : indexLocal.get()) {
+                subContext.setRuleIndex(i);
+            }
+            cmpIdList.forEach(cmpId -> mainContext.setSubContext(cmpId, indexLocal.get()));
+        }
         indexLocal.remove();
         super.afterProcess();
     }

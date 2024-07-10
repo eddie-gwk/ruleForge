@@ -3,7 +3,7 @@ package com.yunext.core.provider;
 import com.yomahub.liteflow.builder.el.LiteFlowChainELBuilder;
 import com.yunext.api.dto.RuleSyntaxTreeDto;
 import com.yunext.api.service.reload.RuleReloadService;
-import com.yunext.common.base.ResultDto;
+import com.yunext.api.dto.ResultDto;
 import com.yunext.common.utils.StringUtil;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboService;

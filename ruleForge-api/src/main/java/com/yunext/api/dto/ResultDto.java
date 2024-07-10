@@ -1,4 +1,4 @@
-package com.yunext.common.base;
+package com.yunext.api.dto;
 
 import com.yunext.common.utils.Returned;
 
@@ -37,11 +37,8 @@ public class ResultDto<T> implements Serializable {
         this.errMsg = errMsg;
     }
 
-    public Returned<T> getData() {
-        if (this.data == null) {
-            return Returned.UNDEFINED;
-        }
-        return new Returned.ReturnValue<>(this.data);
+    public T getData() {
+        return this.data;
     }
 
     public void setData(T data) {

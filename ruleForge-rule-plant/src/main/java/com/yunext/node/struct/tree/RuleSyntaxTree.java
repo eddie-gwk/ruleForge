@@ -47,13 +47,13 @@ public class RuleSyntaxTree {
      * 构建语法树List
      * @param graph
      */
-    public static List<RuleSyntaxTree> createTrees(ChainNodeDirectedGraph<BasicNode> graph) {
+    public static List<RuleSyntaxTree> createTrees(ChainNodeDirectedGraph<BasicNode<?, ?>> graph) {
         List<RuleSyntaxTree> treeList = new ArrayList<>();
         if (graph == null) {
             return treeList;
         }
         graph.calcRoot();
-        Map<BasicNode, Boolean> visited = graph.createVisited();
+        Map<BasicNode<?, ?>, Boolean> visited = graph.createVisited();
         Map<String, RuleTreeNode> treeNodeMap = new HashMap<>();
         //从图的多个起点出发构建语法树，最终都作为虚拟根节点的子节点
         graph.getRoots().forEach(graphRoot -> {
@@ -63,32 +63,20 @@ public class RuleSyntaxTree {
         return treeList;
     }
 
-    /**
-     * 虚拟节点作为根节点
-     * @return
-     */
-    private BasicNode virtualNode() {
-        BasicNode basicNode = new BasicNode();
-        basicNode.setId(StringUtil.uuid());
-        basicNode.setType(NodeTypeEnum.virtual);
-        basicNode.setComponent(ComponentEnum.ROOT);
-        return basicNode;
-    }
-
-    private static RuleTreeNode bfs(BasicNode start, Map<BasicNode, Boolean> visited, Map<String, RuleTreeNode> treeNodeMap, ChainNodeDirectedGraph<BasicNode> graph) {
-        Deque<BasicNode> queue = new ArrayDeque<>();
+    private static RuleTreeNode bfs(BasicNode<?, ?> start, Map<BasicNode<?, ?>, Boolean> visited, Map<String, RuleTreeNode> treeNodeMap, ChainNodeDirectedGraph<BasicNode<?, ?>> graph) {
+        Deque<BasicNode<?, ?>> queue = new ArrayDeque<>();
 
         //标记已访问
         visited.put(start, true);
         queue.addLast(start);
 
         while (!queue.isEmpty()) {
-            BasicNode current = queue.poll();
+            BasicNode<?, ?> current = queue.poll();
             RuleTreeNode currentTreeNode = treeNodeMap.containsKey(current.getId()) ?
                     treeNodeMap.get(current.getId()) : new RuleTreeNode(current);
 
             List<RuleTreeNode> children = new ArrayList<>();
-            for (BasicNode adjVex : graph.getAdjVertices(current)) {
+            for (BasicNode<?, ?> adjVex : graph.getAdjVertices(current)) {
                 if (!Optional.ofNullable(visited.get(adjVex)).orElse(false)) {
                     //没有访问过要取出来标记并且加入到树节点中
                     visited.put(adjVex, true);
@@ -112,6 +100,7 @@ public class RuleSyntaxTree {
         RuleSyntaxTreeDto ruleSyntaxTreeDto = new RuleSyntaxTreeDto();
         ruleSyntaxTreeDto.setChain(this.getChainId());
         ruleSyntaxTreeDto.setRuleDsl(this.getRuleDsl());
+        ruleSyntaxTreeDto.setRoot(this.getRoot());
         return ruleSyntaxTreeDto;
     }
 
@@ -127,7 +116,7 @@ public class RuleSyntaxTree {
 
 
     private void deepRecursion(RuleTreeNode root) {
-        BasicNode node = root.getValue();
+        BasicNode<?, ?> node = root.getValue();
         ComponentEnum component = node.getComponent();
         if (component == null) {
             throw new RuntimeException("unknown component");
@@ -165,6 +154,8 @@ public class RuleSyntaxTree {
                     //这里默认约定传的输出组应和tags一一对应，否则将导致执行错误
                     String tag = node.getContextData().getTags().get(i);
                     subRules.add(subNodes.size() > 1 ? ELBus.when(array).tag(tag) : subNodes.get(0).getCommand().tag(tag));
+                    //加一个默认的分支，如果规则没匹配成功就走这个节点
+                    subRules.add(ELBus.node(ComponentEnum.none.name()).tag("none"));
                 }
                 root.setCommand(
                         ELBus.switchOpt(
@@ -184,12 +175,16 @@ public class RuleSyntaxTree {
         }
     }
 
-    private String nodeData(BasicNode node) {
+    private String nodeData(BasicNode<?, ?> node) {
         return JSONObject.toJSONString(node.getContextData());
     }
 
     public String getChainId() {
         return chainId;
+    }
+
+    public BasicNode<?, ?> getRoot() {
+        return this.root.getValue();
     }
 
     /**

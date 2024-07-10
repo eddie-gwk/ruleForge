@@ -1,5 +1,7 @@
 package com.yunext.api.dto;
 
+import com.yunext.common.base.BasicNode;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +14,9 @@ public class RuleSyntaxTreeDto implements Serializable {
     private String chain;
 
     private String ruleDsl;
+
+    private BasicNode root;
+
 
     public String getChain() {
         return chain;
@@ -27,5 +32,13 @@ public class RuleSyntaxTreeDto implements Serializable {
 
     public void setRuleDsl(String ruleDsl) {
         this.ruleDsl = ruleDsl;
+    }
+
+    public BasicNode getRoot() {
+        return root;
+    }
+
+    public void setRoot(BasicNode root) {
+        this.root = root;
     }
 }
