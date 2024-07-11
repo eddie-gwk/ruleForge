@@ -60,16 +60,26 @@ public class FilterNode extends BasicNode<FilterNode.FilterProp, FilterNode.Filt
         public boolean isPass(String propName, Map<Object, Object> lastMsg, Map<Object, Object> msg) {
             Object lastValue = lastMsg.get(propName);
             Object value = msg.get(propName);
-            Double last = ModelMapperUtil.map(lastValue, Double.class);
-            Double curr = ModelMapperUtil.map(value, Double.class);
             return switch (this.cmd) {
                 case wait_change -> !Objects.equals(lastValue, value);
                 //关于值变化的，统一转为double进行处理
-                case gt_range -> (curr - last) > this.range;
-                case gte_range -> (curr - last) >= this.range;
-                case block_gt_range -> !((curr - last) > this.range);
-                case block_gte_range -> !((curr - last) >= this.range);
+                case gt_range -> this.dataRange(value, lastValue) > this.range;
+                case gte_range -> this.dataRange(value, lastValue) >= this.range;
+                case block_gt_range -> !(this.dataRange(value, lastValue) > this.range);
+                case block_gte_range -> !(this.dataRange(value, lastValue) >= this.range);
             };
+        }
+
+        private double dataRange(Object value, Object lastValue) {
+            if (value == null || lastValue == null) {
+                return -1;
+            }
+            if (value instanceof Number v && lastValue instanceof  Number lv) {
+                Double curr = ModelMapperUtil.map(value, Double.class);
+                Double last = ModelMapperUtil.map(lastValue, Double.class);
+                return curr - last;
+            }
+            return -1;
         }
     }
 }

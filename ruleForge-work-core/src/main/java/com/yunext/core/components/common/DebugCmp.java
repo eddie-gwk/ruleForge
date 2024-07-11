@@ -7,6 +7,7 @@ import com.yunext.common.node.common.DebugNode;
 import com.yunext.core.context.SubContext;
 import com.yunext.core.isolation.IsolationNodeComponent;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * @author ：qianjb [qianjb@hadlinks.com]
@@ -18,17 +19,20 @@ public class DebugCmp extends IsolationNodeComponent {
 
     private static final String ALL = "all";
 
-    @DubboReference
+    /**
+     * TODO 还需要改造一下
+     */
+    @DubboReference(lazy = true)
     private WebSocketService webSocketService;
 
     @Override
     public void process(SubContext subContext) throws Exception {
         DebugNode.DebugProp prop = this.getProp(subContext.getRuleIndex(), DebugNode.DebugProp.class);
-        WebSocketMessageDto webSocketMessageDto;
+        WebSocketMessageDto<?> webSocketMessageDto;
         if (ALL.equals(prop.getPropName())) {
-            webSocketMessageDto = new WebSocketMessageDto(prop.getNodeId(), subContext.getMsg());
+            webSocketMessageDto = new WebSocketMessageDto<>(prop.getNodeId(), subContext.getMsg());
         } else {
-            webSocketMessageDto = new WebSocketMessageDto(prop.getNodeId(), subContext.getMsg().get(prop.getPropName()));
+            webSocketMessageDto = new WebSocketMessageDto<>(prop.getNodeId(), subContext.getMsg().get(prop.getPropName()));
         }
         webSocketService.sendMessage(webSocketMessageDto);
     }

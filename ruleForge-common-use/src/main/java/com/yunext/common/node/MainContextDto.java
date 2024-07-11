@@ -14,6 +14,10 @@ public class MainContextDto implements Serializable {
     private Date timestamp;
     private Map<Object, Object> msg;
 
+    public MainContextDto() {
+        this.timestamp = new Date();
+    }
+
     public Date getTimestamp() {
         return timestamp;
     }

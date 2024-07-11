@@ -1,5 +1,7 @@
 package com.yunext.api.dto;
 
+import org.springframework.web.socket.WebSocketMessage;
+
 import java.io.Serializable;
 
 /**
@@ -7,15 +9,30 @@ import java.io.Serializable;
  * @description ：
  * @date ：Created in 2024/7/10 17:14
  */
-public class WebSocketMessageDto implements Serializable {
+public class WebSocketMessageDto<T> implements WebSocketMessage<T>, Serializable {
 
     private String nodeId;
 
-    private Object value;
+    private T payload;
 
-    public WebSocketMessageDto(String nodeId, Object value) {
+    @Override
+    public T getPayload() {
+        return payload;
+    }
+
+    @Override
+    public int getPayloadLength() {
+        return 0;
+    }
+
+    @Override
+    public boolean isLast() {
+        return false;
+    }
+
+    public WebSocketMessageDto(String nodeId, T payload) {
         this.nodeId = nodeId;
-        this.value = value;
+        this.payload = payload;
     }
 
     public String getNodeId() {
@@ -26,11 +43,7 @@ public class WebSocketMessageDto implements Serializable {
         this.nodeId = nodeId;
     }
 
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
+    public void setPayload(T payload) {
+        this.payload = payload;
     }
 }

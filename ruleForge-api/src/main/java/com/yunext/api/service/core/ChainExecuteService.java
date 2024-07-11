@@ -29,11 +29,11 @@ public interface ChainExecuteService {
      */
     ResultDto<?> executeOnce(String chain, MainContextDto mainContextDto);
 
-    ResultDto<Future<?>> executeOnceSync(String chain);
+    ResultDto<?> executeOnceSync(String chain);
 
-    ResultDto<Future<?>> executeOnceSync(String chain, MainContextDto mainContextDto);
+    ResultDto<?> executeOnceSync(String chain, MainContextDto mainContextDto);
 
-    ResultDto<ScheduledFuture<?>> executeRepeatedly(String chain, MainContextDto mainContextDto,Long initDelay, Long interval, boolean repeat);
+    ResultDto<?> executeRepeatedly(String chain, MainContextDto mainContextDto,Long initDelay, Long interval, boolean repeat);
 
     ResultDto<?> cancelRepeatTask(String chain);
 }

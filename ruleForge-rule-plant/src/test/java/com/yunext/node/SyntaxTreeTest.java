@@ -97,12 +97,11 @@ public class SyntaxTreeTest {
                 for (String vertex : vertices.toList(String.class)) {
                     BasicNode<?, ?> basicNode = new BasicNode<>();
                     basicNode.setId(vertex);
+                    basicNode.setTags(new ArrayList<>());
+                    basicNode.setRules(new ArrayList<>());
+                    basicNode.setProps(new ArrayList<>());
                     basicNode.setType("F1".equals(vertex) ? NodeTypeEnum.select : NodeTypeEnum.ordinary);
                     basicNode.setComponent(ComponentEnum.getByName(vertex));
-                    //组件参数
-                    ComponentContextData contextData = new ComponentContextData();
-                    contextData.setCmpId(basicNode.getId());
-                    basicNode.setContextData(contextData);
                     basicNodeList.add(basicNode);
                 }
                 Map<String, BasicNode<?, ?>> nodeMap = basicNodeList.stream().collect(Collectors.toMap(BasicNode::getId, v -> v));
@@ -124,14 +123,12 @@ public class SyntaxTreeTest {
                     basicNode.setWires(wires);
                     String tag = StringUtil.randomString(5);
                     //设置节点的上下文数据
-                    ComponentContextData contextData = basicNode.getContextData();
-                    contextData.initList(wires.size());
                     for (int i = 0; i < wires.size(); i++) {
-                        contextData.getSubCmpId().add(wires.get(i));
                         if (NodeTypeEnum.isSelect(basicNode.getType().name())) {
-                            contextData.getTags().add(tag + "-" + i);
-                            contextData.getRules().add(new JSONObject());
+                            basicNode.getTags().add(tag + "-" + i);
+                            basicNode.getRules().add(null);
                         }
+                        basicNode.getProps().add(null);
                     }
                 }
                 ChainNodeUndirectedGraph<BasicNode<?, ?>> adjTable = new ChainNodeUndirectedGraph<>(basicNodeList, edgeList);

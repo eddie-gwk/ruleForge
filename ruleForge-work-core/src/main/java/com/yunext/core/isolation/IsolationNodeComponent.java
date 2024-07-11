@@ -2,6 +2,7 @@ package com.yunext.core.isolation;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.yomahub.liteflow.core.NodeComponent;
+import com.yunext.common.node.common.ChangeNode;
 import com.yunext.common.utils.ModelMapperUtil;
 import com.yunext.core.context.ComponentContext;
 import com.yunext.core.context.MainContext;
@@ -45,11 +46,7 @@ public abstract class IsolationNodeComponent extends IsolationComponent {
      */
     public <T> List<T> getRuleList(Class<T> clazz) {
         ComponentContext cmpData = this.getCmpData(ComponentContext.class);
-        return Optional.ofNullable(cmpData)
-                .map(ComponentContext::getRules)
-                .stream()
-                .map(r -> ModelMapperUtil.map(r, clazz))
-                .toList();
+        return cmpData.getRules().stream().map(e->ModelMapperUtil.map(e, clazz)).toList();
     }
 
     public <T> T getProp(int index, Class<T> clazz) {

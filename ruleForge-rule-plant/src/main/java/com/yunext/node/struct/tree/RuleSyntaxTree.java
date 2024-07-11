@@ -6,6 +6,7 @@ import com.yomahub.liteflow.builder.el.ELWrapper;
 import com.yomahub.liteflow.builder.el.NodeELWrapper;
 import com.yunext.api.dto.RuleSyntaxTreeDto;
 import com.yunext.common.base.BasicNode;
+import com.yunext.common.base.ComponentContextData;
 import com.yunext.common.enums.ComponentEnum;
 import com.yunext.common.enums.NodeTypeEnum;
 import com.yunext.common.utils.StringUtil;
@@ -127,7 +128,7 @@ public class RuleSyntaxTree {
         if (CollectionUtils.isEmpty(children)) {
             //叶子节点的命令就是组件名称,节点自身还需要带一个上下文
             root.setCommand(ELBus.node(component.name())
-                    .data(node.getComponent() + StringUtil.randomString(5), this.nodeData(node)));
+                    .data(node.getComponent() + StringUtil.randomString(5), JSONObject.toJSONString(this.nodeData(node))));
             return ;
         }
 
@@ -152,7 +153,7 @@ public class RuleSyntaxTree {
                     //为每个输出口(子分支)创建tag, 如果某个输出口的子节点大于1，进行并行编排(when)
                     Object[] array = subNodes.stream().map(RuleTreeNode::getCommand).toArray();
                     //这里默认约定传的输出组应和tags一一对应，否则将导致执行错误
-                    String tag = node.getContextData().getTags().get(i);
+                    String tag = node.getTags().get(i);
                     subRules.add(subNodes.size() > 1 ? ELBus.when(array).tag(tag) : subNodes.get(0).getCommand().tag(tag));
                     //加一个默认的分支，如果规则没匹配成功就走这个节点
                     subRules.add(ELBus.node(ComponentEnum.none.name()).tag("none"));
@@ -160,13 +161,13 @@ public class RuleSyntaxTree {
                 root.setCommand(
                         ELBus.switchOpt(
                         ELBus.node(component.name())
-                                .data(nodeDataName, this.nodeData(node)))
+                                .data(nodeDataName, JSONObject.toJSONString(this.nodeData(node))))
                         .to(subRules.toArray())
                 );
             }
             case input, output, ordinary, iterate, loop, virtual  -> {
                 //子节点数 > 1，要使用并行编排(when)，否则使用串行编排(then)
-                NodeELWrapper currNode = ELBus.node(component.name()).data(nodeDataName, this.nodeData(node));
+                NodeELWrapper currNode = ELBus.node(component.name()).data(nodeDataName, JSONObject.toJSONString(this.nodeData(node)));
                 ELWrapper elWrapper = children.size() > 1 ? ELBus.then(currNode, ELBus.when(children.stream().map(RuleTreeNode::getCommand).toArray()))
                         : ELBus.then(currNode, children.get(0).getCommand());
                 root.setCommand(elWrapper);
@@ -175,8 +176,17 @@ public class RuleSyntaxTree {
         }
     }
 
-    private String nodeData(BasicNode<?, ?> node) {
-        return JSONObject.toJSONString(node.getContextData());
+    private ComponentContextData nodeData(BasicNode<?, ?> node) {
+        if (node == null) {
+            return new ComponentContextData();
+        }
+        ComponentContextData contextData = new ComponentContextData();
+        contextData.setCmpId(node.getId());
+        contextData.setSubCmpId(node.getWires());
+        contextData.setProps(node.getProps());
+        contextData.setRules(node.getRules());
+        contextData.setTags(node.getTags());
+        return contextData;
     }
 
     public String getChainId() {

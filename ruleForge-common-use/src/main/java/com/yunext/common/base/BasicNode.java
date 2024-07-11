@@ -38,6 +38,10 @@ public class BasicNode<P, R> implements Serializable {
      */
     private List<R> rules;
     /**
+     * 选择组件的分支标签
+     */
+    private List<String> tags;
+    /**
      * 节点名称
      */
     private String name;
@@ -59,10 +63,6 @@ public class BasicNode<P, R> implements Serializable {
      * 如果包含自己的id,通常会报错
      */
     private List<List<String>> wires;
-    /**
-     * 组件参数
-     */
-    private ComponentContextData contextData;
 
     public String getId() {
         return id;
@@ -98,6 +98,14 @@ public class BasicNode<P, R> implements Serializable {
 
     public List<R> getRules() {
         return rules;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public void setRules(List<R> rules) {
@@ -142,14 +150,6 @@ public class BasicNode<P, R> implements Serializable {
 
     public void setWires(List<List<String>> wires) {
         this.wires = wires;
-    }
-
-    public ComponentContextData getContextData() {
-        return contextData;
-    }
-
-    public void setContextData(ComponentContextData contextData) {
-        this.contextData = contextData;
     }
 
     @Override

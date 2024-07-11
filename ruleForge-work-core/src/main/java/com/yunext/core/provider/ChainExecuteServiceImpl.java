@@ -51,12 +51,12 @@ public class ChainExecuteServiceImpl implements ChainExecuteService {
     }
 
     @Override
-    public ResultDto<Future<?>> executeOnceSync(String chain) {
+    public ResultDto<?> executeOnceSync(String chain) {
         return this.executeOnceSync(chain, null);
     }
 
     @Override
-    public ResultDto<Future<?>> executeOnceSync(String chain,  MainContextDto mainContextDto) {
+    public ResultDto<?> executeOnceSync(String chain,  MainContextDto mainContextDto) {
         if (StringUtil.isEmpty(chain)) {
             return ResultDto.fail("chain id must not be null");
         }
@@ -64,12 +64,12 @@ public class ChainExecuteServiceImpl implements ChainExecuteService {
         if (mainContextDto != null) {
             mainContext = ModelMapperUtil.map(mainContextDto, MainContext.class);
         }
-        Future<LiteflowResponse> future = flowExecutor.execute2Future(chain, "args", mainContext);
-        return ResultDto.success(future);
+        flowExecutor.execute2Future(chain, "args", mainContext);
+        return ResultDto.success();
     }
 
     @Override
-    public ResultDto<ScheduledFuture<?>> executeRepeatedly(String chain, MainContextDto mainContextDto, Long initDelay, Long interval, boolean repeat) {
+    public ResultDto<?> executeRepeatedly(String chain, MainContextDto mainContextDto, Long initDelay, Long interval, boolean repeat) {
         if (chainRepeatedlyFutures.containsKey(chain)) {
             //如果已经存在任务先删除
             this.cancelRepeatTask(chain);
@@ -78,7 +78,7 @@ public class ChainExecuteServiceImpl implements ChainExecuteService {
                 ExecutorUtil.scheduleService.scheduleAtFixedRate(() -> this.executeOnce(chain, mainContextDto), initDelay, interval, TimeUnit.SECONDS)
                 : ExecutorUtil.scheduleService.schedule(() -> this.executeOnce(chain, mainContextDto), initDelay, TimeUnit.SECONDS);
         chainRepeatedlyFutures.put(chain, scheduledFuture);
-        return ResultDto.success(scheduledFuture);
+        return ResultDto.success();
     }
 
     @Override

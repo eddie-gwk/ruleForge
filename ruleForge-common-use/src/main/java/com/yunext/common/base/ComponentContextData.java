@@ -30,11 +30,11 @@ public class ComponentContextData implements Serializable {
     /**
      * 组件规则
      */
-    private List<JSONObject> rules;
+    private List<?> rules;
     /**
      * 组件参数
      */
-    private List<JSONObject> props;
+    private List<?> props;
 
     public String getCmpId() {
         return cmpId;
@@ -60,19 +60,19 @@ public class ComponentContextData implements Serializable {
         this.tags = tags;
     }
 
-    public List<JSONObject> getRules() {
+    public List<?> getRules() {
         return rules;
     }
 
-    public void setRules(List<JSONObject> rules) {
+    public void setRules(List<?> rules) {
         this.rules = rules;
     }
 
-    public List<JSONObject> getProps() {
+    public List<?> getProps() {
         return props;
     }
 
-    public void setProps(List<JSONObject> props) {
+    public void setProps(List<?> props) {
         this.props = props;
     }
 

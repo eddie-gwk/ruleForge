@@ -10,7 +10,7 @@ import com.yunext.core.isolation.IsolationSwitchComponent;
  * @description ：
  * @date ：Created in 2024/7/10 14:59
  */
-@LiteflowComponent("change")
+@LiteflowComponent("switch")
 public class SwitchCmp extends IsolationSwitchComponent {
 
     @Override
