@@ -21,15 +21,15 @@
     + <strong>script</strong> 自定义javascript脚本，可以和上下文中的数据互动
     + <strong>mqttIn</strong> 接受特定topic的消息
     + <strong>mqttOut</strong> 输出数据到指定的topic
-2. 将图形化的规则链转换为图，再将图转换为语法树，通过语法树生成[liteflow](https://liteflow.cc/)的DSL语法，最后进行执行
+2. 将图形化的规则链转换为图，再将图转换为语法树，通过语法树生成[liteflow](https://liteflow.cc/)的DSL语法，最后进行执行。<br />
    例如，有如下图中的规则链:
    ![规则链](img/实例规则链.png)
    通过上述功能的转换成的DSL为(默认都是普通节点): <br/>
-   <i>THEN(A1,D1,F1,WHEN(G1,H1),I1)</i> <br/>
-   <i>THEN(B1,D1,F1,WHEN(G1,H1),I1)</i> <br/>
-   <i>THEN(C1,E1,F1,WHEN(G1,H1),I1)</i> <br/>
+   <strong><i>THEN(A1, D1, F1, WHEN(G1, H1), I1); </i></strong> <br/>
+   <strong><i>THEN(B1, D1, F1, WHEN(G1, H1), I1); </i></strong><br/>
+   <strong><i>THEN(C1, E1, F1, WHEN(G1, H1), I1); </i></strong><br/>
 3. 节点和连线关系的数据保存，包括节点所在坐标、其子节点及其连线。允许动态的新增和删除节点。
-4. 实现了liteflow上下文的数据隔离机制，现在允许将父节点的数据副本分发给他的子节点，具体内容请查看抽象类`IsolationComponent。
+4. 实现了liteflow上下文的数据隔离机制，现在允许将父节点的数据副本分发给他的子节点，具体内容请查看抽象类`IsolationComponent`。
 
 ### 节点开发过程
 1. 定义节点
@@ -107,7 +107,7 @@ public class FilterNode extends BasicNode<FilterNode.FilterProp, FilterNode.Filt
 
 ```
 2. 执行逻辑
-在module(ruleForge-work-core)中进行执行逻辑的编写。首先定义节点相应的组件类，需要继承自<strong>IsolationNodeComponent</strong> 或 <strong>IsolationSwitchComponent</strong> ，并且需要使用注解<strong>@LiteflowComponent</strong。
+在module(ruleForge-work-core)中进行执行逻辑的编写。首先定义节点相应的组件类，需要继承自<strong>IsolationNodeComponent</strong> 或 <strong>IsolationSwitchComponent</strong> ，并且需要使用注解<strong>@LiteflowComponent</strong>。
 在组件类中，通过 `this.getCmpData(ComponentContext.class)`获取到组件的节点定义信息，`ComponentContext`类中的props为泛型定义中的输入属性，rules为泛型定义中的规则，根据自己定义的属性和规则类的类型就可以获取到相应的定义信息，如: <br />
 ```java
 FilterNode.FilterProp prop = this.getProp(subContext.getRuleIndex(), FilterNode.FilterProp.class);
