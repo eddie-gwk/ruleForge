@@ -18,6 +18,10 @@ public class FilterNode extends BasicNode<FilterNode.FilterProp, FilterNode.Filt
 
     public static class FilterProp {
         /**
+         * 节点id
+         */
+        private String nodeId;
+        /**
          * 监控的属性名
          */
         private String propName;
@@ -28,6 +32,14 @@ public class FilterNode extends BasicNode<FilterNode.FilterProp, FilterNode.Filt
 
         public void setPropName(String propName) {
             this.propName = propName;
+        }
+
+        public Optional<String> getNodeId() {
+            return Optional.ofNullable(nodeId);
+        }
+
+        public void setNodeId(String nodeId) {
+            this.nodeId = nodeId;
         }
     }
 

@@ -28,3 +28,12 @@ liteflow:
     #如果你没有脚本组件，以下可以不配置
     scriptDataBase: 1
     scriptKey: chain_scripts
+mqtt:
+  username: spring_farm
+  password: YCwn1dr1zCel0zAE
+  server: tcp://127.0.0.1:1883
+redisson-chain:
+  timeout: 3000
+  database: 1
+  address: redis://127.0.0.1:6379
+  password:

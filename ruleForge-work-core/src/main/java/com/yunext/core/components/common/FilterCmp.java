@@ -17,17 +17,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @LiteflowComponent("filter")
 public class FilterCmp extends IsolationSwitchComponent {
 
-    public final Map<Object, Object> lastMsg = new ConcurrentHashMap<>();
+    public final Map<String, Map<Object, Object>> lastMsg = new ConcurrentHashMap<>();
 
     @Override
     public String processSwitch(SubContext subContext) throws Exception {
         FilterNode.FilterProp prop = this.getProp(subContext.getRuleIndex(), FilterNode.FilterProp.class);
         FilterNode.FilterRule rule = this.getRule(subContext.getRuleIndex(), FilterNode.FilterRule.class);
-        if (prop != null && rule != null && rule.isPass(prop.getPropName(), lastMsg, subContext.getMsg())) {
-            return this.getTag(subContext.getRuleIndex());
-        }
+        boolean noBlock = prop != null && rule != null && rule.isPass(prop.getPropName(), lastMsg.get(prop.getNodeId().orElse("default")), subContext.getMsg());
+
         //保存最后一次的处理数据
-        lastMsg.putAll(subContext.getMsg());
-        return DEFAULT_TAG;
+        if (prop != null) {
+            lastMsg.put(prop.getNodeId().orElse("default"), subContext.getMsg());
+        }
+        return noBlock ? this.getTag(subContext.getRuleIndex()) : DEFAULT_TAG;
     }
 }

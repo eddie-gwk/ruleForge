@@ -12,4 +12,8 @@ public interface ComponentService {
 
     ResultDto<?> inject(BasicNode<?, ?> root);
 
+    ResultDto<?> injectOnce(BasicNode<?, ?> root);
+
+    ResultDto<?> mqttIn(BasicNode<?, ?> root);
+
 }

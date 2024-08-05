@@ -7,8 +7,11 @@ import com.yomahub.liteflow.builder.el.NodeELWrapper;
 import com.yunext.api.dto.RuleSyntaxTreeDto;
 import com.yunext.common.base.BasicNode;
 import com.yunext.common.base.ComponentContextData;
+import com.yunext.common.base.ScriptDSL;
 import com.yunext.common.enums.ComponentEnum;
 import com.yunext.common.enums.NodeTypeEnum;
+import com.yunext.common.node.common.ScriptNode;
+import com.yunext.common.utils.ModelMapperUtil;
 import com.yunext.common.utils.StringUtil;
 import com.yunext.node.struct.graph.ChainNodeDirectedGraph;
 import org.apache.commons.collections4.CollectionUtils;
@@ -34,14 +37,19 @@ public class RuleSyntaxTree {
      * 根节点
      */
     private RuleTreeNode root;
+    /**
+     * 脚本
+     */
+    private final List<ScriptDSL> scriptDSLList;
 
     public RuleSyntaxTree() {
+        scriptDSLList = new ArrayList<>();
     }
 
     public RuleSyntaxTree(RuleTreeNode root) {
         this.root = root;
-        this.chainId = StringUtil.isNotEmpty(root.getValue().getChainId()) ?
-                root.getValue().getChainId() : StringUtil.randomString(10);
+        this.scriptDSLList = new ArrayList<>();
+        this.chainId = root.getValue().getChainId();
     }
 
     /**
@@ -102,6 +110,7 @@ public class RuleSyntaxTree {
         ruleSyntaxTreeDto.setChain(this.getChainId());
         ruleSyntaxTreeDto.setRuleDsl(this.getRuleDsl());
         ruleSyntaxTreeDto.setRoot(this.getRoot());
+        ruleSyntaxTreeDto.setScriptDSLList(this.getScriptDSLList());
         return ruleSyntaxTreeDto;
     }
 
@@ -112,6 +121,10 @@ public class RuleSyntaxTree {
      */
     public String getRuleDsl() {
         this.deepRecursion(root);
+        //单节点、至少需要一个THEN
+        if (CollectionUtils.isEmpty(root.getChildren())) {
+            root.setCommand(ELBus.then(root.getCommand()));
+        }
         return root.getCommand().toEL();
     }
 
@@ -127,8 +140,16 @@ public class RuleSyntaxTree {
         List<RuleTreeNode> children = root.getChildren();
         if (CollectionUtils.isEmpty(children)) {
             //叶子节点的命令就是组件名称,节点自身还需要带一个上下文
-            root.setCommand(ELBus.node(component.name())
-                    .data(node.getComponent() + StringUtil.randomString(5), JSONObject.toJSONString(this.nodeData(node))));
+            if (NodeTypeEnum.isSelect(type.name())) {
+                root.setCommand(ELBus.switchOpt(
+                                ELBus.node(component.name())
+                                        .data(StringUtil.randomLetters(5), JSONObject.toJSONString(this.nodeData(node))))
+                        .to(ELBus.node(ComponentEnum.none.name()).tag("none"))
+                );
+            } else {
+                root.setCommand(ELBus.node(component.name())
+                        .data(StringUtil.randomLetters(5), JSONObject.toJSONString(this.nodeData(node))));
+            }
             return ;
         }
 
@@ -140,7 +161,6 @@ public class RuleSyntaxTree {
         switch (NodeTypeEnum.getByName(type.name())) {
             case select -> {
                 //选择节点，要根据输出口和导线组进行tag语法的设置
-                //TODO 没有做严格的校验，目前只是实现语法解析功能
                 List<List<String>> wires = node.getWires();
                 Map<String, RuleTreeNode> treeNodeMap = children.stream().collect(Collectors.toMap(k -> k.getValue().getId(), v -> v));
                 List<ELWrapper> subRules = new ArrayList<>();
@@ -165,26 +185,52 @@ public class RuleSyntaxTree {
                         .to(subRules.toArray())
                 );
             }
-            case input, output, ordinary, iterate, loop, virtual  -> {
+            case input, output, ordinary, iterate, loop, script  -> {
                 //子节点数 > 1，要使用并行编排(when)，否则使用串行编排(then)
-                NodeELWrapper currNode = ELBus.node(component.name()).data(nodeDataName, JSONObject.toJSONString(this.nodeData(node)));
+                NodeELWrapper currNode = ELBus.node(component.name()).data(nodeDataName, JSONObject.toJSONString(this.nodeData(node, NodeTypeEnum.isScript(type.name()))));
                 ELWrapper elWrapper = children.size() > 1 ? ELBus.then(currNode, ELBus.when(children.stream().map(RuleTreeNode::getCommand).toArray()))
                         : ELBus.then(currNode, children.get(0).getCommand());
                 root.setCommand(elWrapper);
+                //脚本节点，单独创建刷新规则。目前仅支持一个节点保存一个脚本,且默认脚本语言为javascript
+                if (NodeTypeEnum.isScript(type.name())) {
+                    List<ScriptNode.ScriptRule> scriptRules = node.getRules().stream().map(r -> ModelMapperUtil.map(r, ScriptNode.ScriptRule.class)).toList();
+                    if (CollectionUtils.isNotEmpty(scriptRules) && scriptRules.size() == 1) {
+                        ScriptNode.ScriptRule scriptRule = scriptRules.get(0);
+                        String key = component.name() + ":script:" + node.getId();
+                        this.addScriptDSL(new ScriptDSL(key, scriptRule.getScript()));
+                    }
+                }
             }
             case unknown -> throw new RuntimeException("unknown node");
         }
     }
 
     private ComponentContextData nodeData(BasicNode<?, ?> node) {
+        return this.nodeData(node, false);
+    }
+
+    /**
+     * 进行组件参数的构建
+     * @param node
+     * @param simple
+     * @notice
+     * script节点要简化组件参数，因为脚本语言作为参数传递时会出现json解析错误
+     * 例如javascript语句 console.log("hello world"),就会因为引号问题解析失败
+     * 具体位置可参见ScriptComponent 31
+     * 且过长的脚本语句进行数据传输时也有很多不可控因素
+     * @return
+     */
+    private ComponentContextData nodeData(BasicNode<?, ?> node, boolean simple) {
         if (node == null) {
             return new ComponentContextData();
         }
         ComponentContextData contextData = new ComponentContextData();
         contextData.setCmpId(node.getId());
         contextData.setSubCmpId(node.getWires());
+        if (!simple) {
+            contextData.setRules(node.getRules());
+        }
         contextData.setProps(node.getProps());
-        contextData.setRules(node.getRules());
         contextData.setTags(node.getTags());
         return contextData;
     }
@@ -195,6 +241,16 @@ public class RuleSyntaxTree {
 
     public BasicNode<?, ?> getRoot() {
         return this.root.getValue();
+    }
+
+    public void addScriptDSL(ScriptDSL scriptDSL) {
+        if (scriptDSL != null) {
+            this.scriptDSLList.add(scriptDSL);
+        }
+    }
+
+    public List<ScriptDSL> getScriptDSLList() {
+        return scriptDSLList;
     }
 
     /**

@@ -24,6 +24,22 @@ public enum ComponentEnum {
      * 调试
      */
     debug,
+    /**
+     * 选择节点
+     */
+    _switch,
+    /**
+     * mqtt输入
+     */
+    mqtt_in,
+    /**
+     * mqtt输出
+     */
+    mqtt_out,
+    /**
+     * javascript脚本
+     */
+    js_func,
 
     //仅供测试使用
     A1,B1,C1,D1,E1,F1,G1,H1,I1,
@@ -37,5 +53,9 @@ public enum ComponentEnum {
             }
         }
         return UNDEFINED;
+    }
+
+    public static boolean isInject(String name) {
+        return inject.name().equals(name);
     }
 }

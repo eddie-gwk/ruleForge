@@ -1,8 +1,10 @@
 package com.yunext.api.dto;
 
 import com.yunext.common.base.BasicNode;
+import com.yunext.common.base.ScriptDSL;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author ：qianjb [qianjb@hadlinks.com]
@@ -16,6 +18,11 @@ public class RuleSyntaxTreeDto implements Serializable {
     private String ruleDsl;
 
     private BasicNode root;
+
+    /**
+     * 脚本
+     */
+    private List<ScriptDSL> scriptDSLList;
 
 
     public String getChain() {
@@ -40,5 +47,13 @@ public class RuleSyntaxTreeDto implements Serializable {
 
     public void setRoot(BasicNode root) {
         this.root = root;
+    }
+
+    public List<ScriptDSL> getScriptDSLList() {
+        return scriptDSLList;
+    }
+
+    public void setScriptDSLList(List<ScriptDSL> scriptDSLList) {
+        this.scriptDSLList = scriptDSLList;
     }
 }

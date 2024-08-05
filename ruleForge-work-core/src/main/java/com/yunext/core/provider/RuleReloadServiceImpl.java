@@ -1,14 +1,19 @@
 package com.yunext.core.provider;
 
 import com.yomahub.liteflow.builder.el.LiteFlowChainELBuilder;
+import com.yomahub.liteflow.script.validator.ScriptValidator;
 import com.yunext.api.dto.RuleSyntaxTreeDto;
 import com.yunext.api.service.reload.RuleReloadService;
 import com.yunext.api.dto.ResultDto;
+import com.yunext.common.base.ScriptDSL;
 import com.yunext.common.utils.StringUtil;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -22,6 +27,14 @@ public class RuleReloadServiceImpl implements RuleReloadService {
 
     @Resource
     private RedissonClient redissonClient;
+
+    @Value("${liteflow.rule-source-ext-data-map.chainKey}")
+    private String chainKey;
+
+    @Value("${liteflow.rule-source-ext-data-map.scriptKey}")
+    private String scriptKey;
+
+    private final static Logger log = LoggerFactory.getLogger(RuleReloadServiceImpl.class);
 
     @Override
     public ResultDto<?> reload(String chain, String rule) {
@@ -56,6 +69,20 @@ public class RuleReloadServiceImpl implements RuleReloadService {
         }
         for (RuleSyntaxTreeDto ruleSyntaxTreeDto : ruleSyntaxTreeDtoList) {
             reload(ruleSyntaxTreeDto);
+        }
+        return ResultDto.success();
+    }
+
+    @Override
+    public ResultDto<?> reloadScript(List<ScriptDSL> scriptDslList) {
+        RMapCache<Object, Object> chainScripts = redissonClient.getMapCache(scriptKey);
+        for (ScriptDSL scriptDsl : scriptDslList) {
+            boolean validate = ScriptValidator.validate(scriptDsl.getScript());
+            if (!validate) {
+                log.error(String.format("script validate failed, key:%s, script:\n%s", scriptDsl.getKey(), scriptDsl.getScript()));
+                return ResultDto.fail("js 脚本校验失败");
+            }
+            chainScripts.put(scriptDsl.getKey(), scriptDsl.getScript());
         }
         return ResultDto.success();
     }

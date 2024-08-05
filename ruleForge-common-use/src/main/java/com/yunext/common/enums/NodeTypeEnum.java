@@ -37,12 +37,20 @@ public enum NodeTypeEnum {
      */
     iterate,
     /**
+     * 脚本节点
+     */
+    script,
+    /**
      * 未知
      */
     unknown;
 
     public static boolean isSelect(String name) {
         return select.name().equals(name);
+    }
+
+    public static boolean isScript(String name) {
+        return script.name().equals(name);
     }
 
     public static boolean isOutput(String name) {

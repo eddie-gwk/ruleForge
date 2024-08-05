@@ -519,4 +519,14 @@ public final class StringUtil {
             return new String(buf);
         }
     }
+
+    public static String randomLetters(int length) {
+        String ALLCHAR = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        StringBuffer sb = new StringBuffer();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            sb.append(ALLCHAR.charAt(random.nextInt(ALLCHAR.length())));
+        }
+        return sb.toString();
+    }
 }
